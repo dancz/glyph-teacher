@@ -40,6 +40,10 @@ function App() {
             <div style={{ color: 'var(--accent-cyan-dim)', maxWidth: '80%', fontSize: '0.8rem', marginTop: 'auto', marginBottom: '20px' }}>
                 Replication of the Ingress Glyph Hack Mini-Game. <br/>
                 Select a level above to commence hacking.
+                <div style={{ marginTop: '10px', fontSize: '0.6rem', opacity: 0.5 }}>
+                  {/* eslint-disable-next-line no-undef */}
+                  v{__APP_VERSION__}
+                </div>
             </div>
         </div>
       );
