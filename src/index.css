@@ -22,6 +22,7 @@ body {
   padding: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: #000000;
   color: #ffffff;
   font-family: 'Share Tech Mono', monospace;
@@ -175,6 +176,7 @@ button {
 .screen-container {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -192,8 +194,9 @@ button {
   }
 
   .screen-container {
-    width: calc(100vh * 9 / 16);
+    width: calc(100dvh * 9 / 16);
     height: 100vh;
+    height: 100dvh;
     max-width: 450px;
     max-height: calc(450px * 16 / 9);
     border-left: 1px solid rgba(0, 229, 255, 0.35);
