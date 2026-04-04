@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment / local config
+*.local
+.env
+.env.*
+!.env.example
+
+# Downloaded source data (extracted from zip, data already in src/data/)
+ingress-glyph-tools-master/
+master.zip
+
+# One-off data extraction scripts (output already committed in src/data/)
+script.cjs
+script2.cjs
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Vite cache
+.vite/
