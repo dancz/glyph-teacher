@@ -1,7 +1,7 @@
 const SEQ_KEY   = 'glyph_trainer_progress';
 const GLYPH_KEY = 'glyph_trainer_glyphs';
 
-const MODES = ['visual', 'text'];
+const MODES = ['visual', 'text', 'level'];
 
 // ─── Generic storage helpers ──────────────────────────────────────────────────
 function load(key) {

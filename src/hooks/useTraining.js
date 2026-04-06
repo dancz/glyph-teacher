@@ -122,6 +122,20 @@ export function useTraining() {
   }, [userInputs]);
 
   const next = useCallback(() => {
+    if (trainingMode === 'level' && feedbackFlags.length > 0 && !feedbackFlags.every(Boolean)) {
+      // Retry the same sequence
+      setUserInputs([]);
+      setInputIndex(0);
+      setFeedbackFlags([]);
+      setPendingFeedback(false);
+      setDisplayIndex(0);
+      setState(TRAINING_STATES.DISPLAYING);
+    } else {
+      startSession(levelFilter, trainingMode);
+    }
+  }, [startSession, levelFilter, trainingMode, feedbackFlags]);
+
+  const skip = useCallback(() => {
     startSession(levelFilter, trainingMode);
   }, [startSession, levelFilter, trainingMode]);
 
@@ -150,6 +164,7 @@ export function useTraining() {
     handleInputEnd,
     handleRedo,
     next,
+    skip,
     quit,
     refreshSummary,
   };

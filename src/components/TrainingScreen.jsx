@@ -86,7 +86,7 @@ export default function TrainingScreen() {
   const {
     state, trainingMode, levelFilter, currentSeq, displayIndex, inputIndex,
     userInputs, feedbackFlags, pendingFeedback, summary,
-    startSession, advanceDisplay, finishDisplay, handleInputEnd, handleRedo, next, quit, refreshSummary,
+    startSession, advanceDisplay, finishDisplay, handleInputEnd, handleRedo, next, skip, quit, refreshSummary,
   } = training;
 
   // Load summary on mount
@@ -160,6 +160,17 @@ export default function TrainingScreen() {
                 <span style={{ fontSize: '1.2rem' }}>Aa</span>
                 <span className="font-orbitron" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>TEXT</span>
                 <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', lineHeight: 1.3 }}>Read word,{String.fromCharCode(10)}draw from memory</span>
+              </button>
+              <button
+                onClick={() => startSession(levelFilter, 'level')}
+                className="btn-secondary"
+                style={{ flex: 1, flexDirection: 'column', height: 'auto', padding: '12px 8px', gap: '6px',
+                  borderColor: trainingMode === 'level' ? 'rgba(0,255,100,0.6)' : 'rgba(130,100,200,0.3)',
+                  color: trainingMode === 'level' ? '#00ff66' : 'rgba(200,180,255,0.6)' }}
+              >
+                <span style={{ fontSize: '1.2rem' }}>↻</span>
+                <span className="font-orbitron" style={{ fontSize: '0.7rem', letterSpacing: '0.05em' }}>BY LEVEL</span>
+                <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', lineHeight: 1.3 }}>Repeat until{String.fromCharCode(10)}correct</span>
               </button>
             </div>
           </div>
@@ -239,13 +250,19 @@ export default function TrainingScreen() {
     const isShowing = displayIndex % 2 === 0;
     const actualIdx = Math.floor(displayIndex / 2);
     const glyphStr = isShowing && actualIdx < currentSeq.edges.length ? currentSeq.edges[actualIdx] : '';
+    const glyphWord = isShowing && actualIdx < currentSeq.words.length ? currentSeq.words[actualIdx] : '';
     return (
       <div className="flex-1 flex-column py-4 w-full items-center">
-        <div className="font-orbitron text-lg text-center" style={{ letterSpacing: '0.05em', color: 'var(--text-muted)' }}>MEMORISE SEQUENCE</div>
+        <div className="font-orbitron text-lg text-center uppercase" style={{ letterSpacing: '0.05em', color: glyphWord ? '#dcaaff' : 'var(--text-muted)' }}>
+          {glyphWord ? glyphWord : 'MEMORISE SEQUENCE'}
+        </div>
         <div style={{ height: '1px', width: '90%', background: 'linear-gradient(90deg, transparent, rgba(180,150,255,0.4), transparent)', margin: '8px auto' }} />
         <TrainingHexRow sequence={currentSeq} displayIndex={displayIndex} inputIndex={0} feedbackFlags={[]} phase={state} />
         <div className="flex-1 flex-center w-full px-2">
           <GlyphGrid mode="display" glyphStr={glyphStr} size="100%" />
+        </div>
+        <div style={{ padding: '8px 16px', display: 'flex', justifyContent: 'center', width: '100%', marginTop: 'auto' }}>
+          <button onClick={quit} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '6px 14px', cursor: 'pointer', fontFamily: 'Share Tech Mono, monospace' }}>GIVE UP</button>
         </div>
       </div>
     );
@@ -301,7 +318,7 @@ export default function TrainingScreen() {
             </div>
           ) : <div style={{ flex: 1 }} />}
 
-          <button onClick={quit} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '6px 14px', cursor: 'pointer', fontFamily: 'Share Tech Mono, monospace' }}>QUIT</button>
+          <button onClick={quit} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px', padding: '6px 14px', cursor: 'pointer', fontFamily: 'Share Tech Mono, monospace' }}>GIVE UP</button>
         </div>
       </div>
     );
@@ -355,8 +372,15 @@ export default function TrainingScreen() {
         </div>
 
         <div className="screen-footer" style={{ gap: '12px' }}>
-          <button onClick={quit} className="btn-secondary" style={{ flex: 1 }}>QUIT</button>
-          <button onClick={next} className="btn-secondary" style={{ flex: 2, borderColor: 'rgba(0,229,255,0.5)', color: '#00e5ff' }}>NEXT →</button>
+          <button onClick={quit} className="btn-secondary" style={{ flex: 1 }}>GIVE UP</button>
+          
+          {!allCorrect && trainingMode === 'level' ? (
+            <button onClick={skip} className="btn-secondary" style={{ flex: 1, borderColor: 'rgba(255,68,119,0.5)', color: '#ff4477' }}>SKIP</button>
+          ) : null}
+
+          <button onClick={next} className="btn-secondary" style={{ flex: 2, borderColor: 'rgba(0,229,255,0.5)', color: '#00e5ff' }}>
+            {allCorrect || trainingMode !== 'level' ? 'NEXT →' : 'RETRY ↺'}
+          </button>
         </div>
       </>
     );
