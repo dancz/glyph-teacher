@@ -329,20 +329,18 @@ export default function TrainingScreen() {
                   <div className="font-orbitron uppercase mb-2" style={{ fontSize: '0.85rem', color: correct ? '#00e5ff' : '#ff4477' }}>
                     {word} {correct ? '✓' : '✗'}
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
-                    {!correct && (
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ width: 70, height: 70, marginBottom: 4 }}>
-                          <GlyphGrid mode="display" glyphStr={userInputs[i] || ''} size="100%" showGuides={false} mini={true} showNodes={true} customLineClass="drawn-edge" />
-                        </div>
-                        <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>YOUR DRAW</div>
-                      </div>
-                    )}
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ width: 70, height: 70, marginBottom: 4 }}>
-                        <GlyphGrid mode="display" glyphStr={currentSeq.edges[i]} size="100%" showGuides={false} mini={true} showNodes={true} customLineClass="display-edge" />
+                        <GlyphGrid 
+                          mode="display" 
+                          glyphStr={currentSeq.edges[i]} 
+                          size="100%" 
+                          mini={true} 
+                          showNodes={true} 
+                          customLineClass={correct ? "display-edge" : "error-edge"} 
+                        />
                       </div>
-                      <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>CORRECT</div>
                     </div>
                   </div>
                 </div>

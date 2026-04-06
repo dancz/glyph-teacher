@@ -108,6 +108,20 @@
   opacity: 0.2;
 }
 
+.error-edge .edge-layer-glow-outer {
+  stroke: #ff4477;
+  opacity: 0.3;
+}
+
+.error-edge .edge-layer-glow-inner {
+  stroke: #ff4477;
+}
+
+.error-edge .edge-layer-particles,
+.error-edge .edge-layer-core {
+  stroke: #ffbbcc;
+}
+
 .drawn-edge {
   animation: drawLine 0.3s ease-out forwards;
 }

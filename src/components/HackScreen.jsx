@@ -45,11 +45,11 @@ export default function HackScreen({ game }) {
             const isCorrect = results.flags ? results.flags[i] : false;
             if (i === displayIndex) {
                  status = isCorrect ? 'active' : 'error-active';
-                 glyphStr = isCorrect ? sequence.edges[i] : (userInputs[i] || '');
             } else {
                  status = isCorrect ? 'done' : 'error';
-                 glyphStr = isCorrect ? sequence.edges[i] : (userInputs[i] || '');
             }
+            // Always show the correct glyph, ignoring what the user falsely drew
+            glyphStr = sequence.edges[i];
         }
         hexes.push({ status, glyphStr });
     }
@@ -85,7 +85,13 @@ export default function HackScreen({ game }) {
                      </svg>
                      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                          {h.glyphStr && (
-                             <GlyphGrid mode="display" glyphStr={h.glyphStr} size={38} showGuides={false} mini={true} />
+                             <GlyphGrid 
+                               mode="display" 
+                               glyphStr={h.glyphStr} 
+                               size={38} 
+                               mini={true} 
+                               customLineClass={h.status.includes('error') ? 'error-edge' : 'display-edge'} 
+                             />
                          )}
                      </div>
                   </div>
