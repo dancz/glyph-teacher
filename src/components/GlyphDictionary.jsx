@@ -35,7 +35,6 @@ export default function GlyphDictionary() {
                     mode="display" 
                     glyphStr={glyph.edges} 
                     size="100%" 
-                    showGuides={false} 
                     mini={true} 
                     showNodes={true}
                     customLineClass="display-edge"

@@ -35,7 +35,6 @@ export default function GlyphGrid({
   glyphStr = '',   // string of edges to display
   onInputEnd = null, // callback(inputStr)
   size = 300,
-  showGuides = true,
   mini = false,
   customLineClass = '',
   showNodes = !mini
@@ -247,14 +246,6 @@ export default function GlyphGrid({
             <stop offset="100%" stopColor="#ffbe00" stopOpacity="1" />
           </linearGradient>
         </defs>
-
-        {/* Background hexagon guide */}
-        {showGuides && (
-          <polygon 
-            points={HEXAGON_PTS} 
-            className="guide-hexagon"
-          />
-        )}
 
         {/* Drawn edges / Display edges - Multi-layered for Ingress-fidelity */}
         {displayEdges.map((edge, idx) => {

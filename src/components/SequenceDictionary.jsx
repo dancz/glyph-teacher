@@ -96,7 +96,6 @@ export default function SequenceDictionary() {
                                             mode="display" 
                                             glyphStr={edges} 
                                             size="100%" 
-                                            showGuides={false} 
                                             mini={true} 
                                             customLineClass="display-edge"
                                          />

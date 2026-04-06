@@ -245,7 +245,7 @@ export default function TrainingScreen() {
         <div style={{ height: '1px', width: '90%', background: 'linear-gradient(90deg, transparent, rgba(180,150,255,0.4), transparent)', margin: '8px auto' }} />
         <TrainingHexRow sequence={currentSeq} displayIndex={displayIndex} inputIndex={0} feedbackFlags={[]} phase={state} />
         <div className="flex-1 flex-center w-full px-2">
-          <GlyphGrid mode="display" glyphStr={glyphStr} size="100%" showGuides={true} />
+          <GlyphGrid mode="display" glyphStr={glyphStr} size="100%" />
         </div>
       </div>
     );
@@ -282,7 +282,7 @@ export default function TrainingScreen() {
         )}
 
         <div className="flex-1 flex-center w-full px-2">
-          <GlyphGrid key={inputIndex} mode="input" onInputEnd={handleInputEnd} size="100%" showGuides={false} />
+          <GlyphGrid key={inputIndex} mode="input" onInputEnd={handleInputEnd} size="100%" />
         </div>
         <div style={{ padding: '8px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '10px' }}>
           <button

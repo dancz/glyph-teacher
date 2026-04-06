@@ -115,7 +115,7 @@ export default function HackScreen({ game }) {
         <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent 10%, rgba(180, 150, 255, 0.4) 50%, transparent 90%)', width: '90%', marginBottom: '10px' }} />
         {renderHexagonsRow()}
         <div className="flex-1 flex-center w-full px-2">
-            <GlyphGrid mode="display" glyphStr={glyphStr} size="100%" showGuides={false} />
+            <GlyphGrid mode="display" glyphStr={glyphStr} size="100%" />
         </div>
       </div>
     );
@@ -133,7 +133,6 @@ export default function HackScreen({ game }) {
               mode="input" 
               onInputEnd={handleInputEnd} 
               size="100%" 
-              showGuides={false} 
             />
         </div>
         
