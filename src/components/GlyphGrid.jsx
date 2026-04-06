@@ -246,10 +246,6 @@ export default function GlyphGrid({
             <stop offset="50%" stopColor="#dcaaff" stopOpacity="1" />
             <stop offset="100%" stopColor="#ffbe00" stopOpacity="1" />
           </linearGradient>
-          <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="0.05" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
         </defs>
 
         {/* Background hexagon guide */}
@@ -270,17 +266,22 @@ export default function GlyphGrid({
           
           return (
             <g key={idx} className={`edge-group ${lineClass}`}>
-               {/* 1. Underlying wide glow */}
+               {/* 1. Underlying wide glow (Outer) */}
                <line 
                   x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
-                  className="edge-layer-glow"
+                  className="edge-layer-glow-outer"
                />
-               {/* 2. Particle "Energy" layer - handled via dash-array in CSS */}
+               {/* 2. Narrow glowing beam (Inner) */}
+               <line 
+                  x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
+                  className="edge-layer-glow-inner"
+               />
+               {/* 3. Particle "Energy" layer */}
                <line 
                   x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
                   className="edge-layer-particles"
                />
-               {/* 3. Bright core center */}
+               {/* 4. Bright core center */}
                <line 
                   x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
                   className="edge-layer-core"
@@ -315,9 +316,11 @@ export default function GlyphGrid({
           const rBase = mini ? 0.04 : 0.055;
           return (
             <g key={idx} className={`node-group ${mini ? 'mini-node' : ''} ${isActive ? 'active' : ''}`}>
-              {/* Outer halo blur */}
-              <circle cx={pos[0]} cy={pos[1]} r={rBase * 2.5} className="node-halo" />
-              {/* Center point */}
+              {/* Layer 1: Wide faint halo */}
+              <circle cx={pos[0]} cy={pos[1]} r={rBase * 2.8} className="node-halo-outer" />
+              {/* Layer 2: Glowing rim */}
+              <circle cx={pos[0]} cy={pos[1]} r={rBase * 1.8} className="node-halo-inner" />
+              {/* Layer 3: Center point */}
               <circle cx={pos[0]} cy={pos[1]} r={rBase} className="node-core" />
             </g>
           );

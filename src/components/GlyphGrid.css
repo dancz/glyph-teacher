@@ -26,38 +26,44 @@
   pointer-events: none;
 }
 
-.node-halo {
-  fill: rgba(180, 160, 255, 0.15);
-  filter: blur(0.04rem);
-  opacity: 0.6;
+.node-halo-outer {
+  fill: rgba(180, 160, 255, 0.08);
+  transition: all 0.3s ease;
+}
+
+.node-halo-inner {
+  fill: rgba(180, 160, 255, 0.12);
   transition: all 0.3s ease;
 }
 
 .node-core {
   fill: #000;
-  stroke: rgba(255, 255, 255, 0.4);
+  stroke: rgba(255, 255, 255, 0.3);
   stroke-width: 0.006;
   transition: all 0.2s ease;
 }
 
 /* On-demand glowing active state */
-.active.node-group .node-halo {
+.active.node-group .node-halo-outer {
+  fill: #00e5ff;
+  opacity: 0.4;
+}
+
+.active.node-group .node-halo-inner {
   fill: #fff;
-  opacity: 0.8;
-  filter: blur(0.06rem) drop-shadow(0 0 5px #a95eff) drop-shadow(0 0 10px #00e5ff);
+  opacity: 0.6;
 }
 
 .active.node-group .node-core {
   fill: #fff;
   stroke: none;
-  filter: drop-shadow(0 0 2px #fff);
 }
 
-.mini-node .node-halo {
-  opacity: 0.3;
+.mini-node .node-halo-outer, .mini-node .node-halo-inner {
+  opacity: 0.5;
 }
 
-.mini-node.active .node-halo {
+.mini-node.active .node-halo-outer {
   opacity: 1;
 }
 
@@ -65,17 +71,22 @@
   pointer-events: none;
 }
 
-.edge-layer-glow, .edge-layer-particles, .edge-layer-core {
+.edge-layer-glow-outer, .edge-layer-glow-inner, .edge-layer-particles, .edge-layer-core {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.edge-layer-glow {
+.edge-layer-glow-outer {
   stroke: url(#beamGradient);
-  stroke-width: 0.18;
-  opacity: 0.35;
-  filter: blur(0.01px);
+  stroke-width: 0.25;
+  opacity: 0.15;
+}
+
+.edge-layer-glow-inner {
+  stroke: #ffffff;
+  stroke-width: 0.12;
+  opacity: 0.2;
 }
 
 .edge-layer-particles {
@@ -90,13 +101,11 @@
   stroke: #ffffff;
   stroke-width: 0.03;
   opacity: 0.95;
-  filter: drop-shadow(0 0 2px #fff);
 }
 
-.display-edge .edge-layer-glow {
+.display-edge .edge-layer-glow-outer {
   stroke: #ffebb3;
-  opacity: 0.4;
-  filter: drop-shadow(0 0 4px rgba(255, 200, 50, 0.6));
+  opacity: 0.2;
 }
 
 .drawn-edge {
@@ -104,19 +113,16 @@
 }
 
 .drawing-beam {
-  stroke: #00e5ff;
-  stroke-width: 0.12;
-  filter: blur(0.02px) drop-shadow(0 0 8px rgba(0, 229, 255, 0.8));
-  opacity: 0.8;
+  stroke: rgba(0, 229, 255, 0.15);
+  stroke-width: 0.24;
   stroke-dasharray: 0.1 0.2;
-  animation: beamFlow 1.5s linear infinite, electricFlicker 0.1s infinite alternate;
+  animation: beamFlow 1.5s linear infinite;
 }
 
 .drawing-core {
   stroke: #ffffff;
   stroke-width: 0.03;
-  filter: drop-shadow(0 0 4px #fff);
-  animation: electricFlicker 0.15s infinite;
+  opacity: 0.8;
 }
 
 @keyframes beamFlow {
