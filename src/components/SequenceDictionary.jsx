@@ -7,11 +7,11 @@ export default function SequenceDictionary() {
   const [levelFilter, setLevelFilter] = useState(null);
 
   const getTargetSet = (lvl) => {
-    if(lvl >= 8) return 8;
-    if(lvl >= 7) return 7;
-    if(lvl >= 6) return 5; 
-    if(lvl >= 3) return 2;
-    return 0;
+    if(lvl >= 8) return 8; // 5 glyphs
+    if(lvl >= 6) return 7; // 4 glyphs
+    if(lvl >= 3) return 5; // 3 glyphs
+    if(lvl >= 2) return 2; // 2 glyphs
+    return 0;              // 1 glyph
   };
 
   // Group sequences by length (number of words)

@@ -29,11 +29,11 @@ export function getRandomSequence(level) {
   // L7: [7] -> 4 or 5 glyphs
   // L8: [8] -> 5 glyphs
   let targetSet = 0;
-  if(level >= 8) targetSet = 8;
-  else if(level >= 7) targetSet = 7;
-  else if(level >= 6) targetSet = 5; // Level 6-7 portals usually have 4 glyphs, some 3.
-  else if(level >= 3) targetSet = 2;
-  else targetSet = 0;
+  if(level >= 8) targetSet = 8; // 5 glyphs
+  else if(level >= 6) targetSet = 7; // 4 glyphs
+  else if(level >= 3) targetSet = 5; // 3 glyphs
+  else if(level >= 2) targetSet = 2; // 2 glyphs
+  else targetSet = 0; // 1 glyph
 
   const validSequences = sequencesData.filter(s => s.levels.includes(targetSet));
   if(validSequences.length === 0) {
@@ -57,7 +57,7 @@ export { glyphsData, sequencesData };
 export function getAllSequences(level = null) {
   let seqs = sequencesData;
   if (level !== null) {
-    const targetSet = level >= 8 ? 8 : level >= 7 ? 7 : level >= 6 ? 5 : level >= 3 ? 2 : 0;
+    const targetSet = level >= 8 ? 8 : level >= 6 ? 7 : level >= 3 ? 5 : level >= 2 ? 2 : 0;
     seqs = seqs.filter(s => s.levels.includes(targetSet));
   }
   return seqs.map(seq => ({

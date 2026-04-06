@@ -77,9 +77,9 @@ export default function HackScreen({ game }) {
   const renderHexagonsRow = () => {
       const HEX_PTS = "50,5 95,28 95,72 50,95 5,72 5,28";
       return (
-          <div className="flex justify-center items-center my-4" style={{ gap: '15px' }}>
+          <div className="flex-center my-4 w-full" style={{ gap: '10px', flexWrap: 'wrap' }}>
               {hexagonsContent.map((h, i) => (
-                  <div key={i} className={`mini-hex-container ${h.status}`} style={{ position: 'relative', width: '50px', height: '50px' }}>
+                  <div key={i} className={`mini-hex-container ${h.status}`} style={{ position: 'relative', width: '50px', height: '50px', flexShrink: 0 }}>
                      <svg viewBox="0 0 100 100" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'visible' }}>
                         <polygon points={HEX_PTS} className="mini-hex-outline" />
                      </svg>
@@ -176,8 +176,20 @@ export default function HackScreen({ game }) {
           {renderHexagonsRow()}
 
           {/* Fixed-height word slot — never reflowing the layout below */}
-          <div style={{ height: '5.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <h1 className="font-orbitron uppercase" style={{ fontSize: 'clamp(1.5rem, 7vw, 2.8rem)', color: '#a0bdff', letterSpacing: '0.05em', margin: 0 }}>
+          <div style={{ height: '5.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
+            <h1 
+              className="font-orbitron uppercase" 
+              style={{ 
+                fontSize: `clamp(1rem, ${Math.min(7, 85 / Math.max(sequence.words[actualIndex].length, 5))}vw, 2.4rem)`, 
+                color: '#a0bdff', 
+                letterSpacing: '0.05em', 
+                margin: 0,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%'
+              }}
+            >
               {sequence.words[actualIndex]}
             </h1>
           </div>
