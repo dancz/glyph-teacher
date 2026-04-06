@@ -21,55 +21,112 @@
   transition: all 0.3s ease;
 }
 
-.glyph-node {
-  fill: #fff;
-  stroke: transparent;
-  stroke-width: 0.05;
+.node-group {
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.node-halo {
+  fill: rgba(180, 160, 255, 0.15);
+  filter: blur(0.04rem);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.node-core {
+  fill: #000;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 0.006;
   transition: all 0.2s ease;
-  filter: drop-shadow(0 0 4px rgba(220, 170, 255, 0.6));
 }
 
-.glyph-node.active {
+/* On-demand glowing active state */
+.active.node-group .node-halo {
   fill: #fff;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
-  transform: scale(1.4);
-  transform-box: fill-box;
-  transform-origin: center;
+  opacity: 0.8;
+  filter: blur(0.06rem) drop-shadow(0 0 5px #a95eff) drop-shadow(0 0 10px #00e5ff);
 }
 
-.mini-node {
-  fill: rgba(255, 255, 255, 0.2);
-  filter: none;
+.active.node-group .node-core {
+  fill: #fff;
+  stroke: none;
+  filter: drop-shadow(0 0 2px #fff);
 }
 
-.mini-node.active {
-  fill: rgba(255, 255, 255, 0.8);
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
-  transform: scale(1.2);
+.mini-node .node-halo {
+  opacity: 0.3;
 }
 
-.glyph-edge, .drawing-edge {
+.mini-node.active .node-halo {
+  opacity: 1;
+}
+
+.edge-group {
+  pointer-events: none;
+}
+
+.edge-layer-glow, .edge-layer-particles, .edge-layer-core {
   fill: none;
-  stroke-width: 0.06;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.display-edge {
+.edge-layer-glow {
+  stroke: url(#beamGradient);
+  stroke-width: 0.18;
+  opacity: 0.35;
+  filter: blur(0.01px);
+}
+
+.edge-layer-particles {
+  stroke: #ffffff;
+  stroke-width: 0.07;
+  stroke-dasharray: 0.01 0.12;
+  opacity: 0.8;
+  animation: beamFlow 1.2s linear infinite;
+}
+
+.edge-layer-core {
+  stroke: #ffffff;
+  stroke-width: 0.03;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 2px #fff);
+}
+
+.display-edge .edge-layer-glow {
   stroke: #ffebb3;
-  filter: drop-shadow(0 0 4px rgba(255, 200, 50, 0.8));
+  opacity: 0.4;
+  filter: drop-shadow(0 0 4px rgba(255, 200, 50, 0.6));
 }
 
 .drawn-edge {
-  stroke: #ffffff;
-  filter: drop-shadow(0 0 6px #a95eff);
   animation: drawLine 0.3s ease-out forwards;
 }
 
-.drawing-edge {
+.drawing-beam {
+  stroke: #00e5ff;
+  stroke-width: 0.12;
+  filter: blur(0.02px) drop-shadow(0 0 8px rgba(0, 229, 255, 0.8));
+  opacity: 0.8;
+  stroke-dasharray: 0.1 0.2;
+  animation: beamFlow 1.5s linear infinite, electricFlicker 0.1s infinite alternate;
+}
+
+.drawing-core {
   stroke: #ffffff;
-  stroke-width: 0.04;
-  filter: drop-shadow(0 0 4px #a95eff);
+  stroke-width: 0.03;
+  filter: drop-shadow(0 0 4px #fff);
+  animation: electricFlicker 0.15s infinite;
+}
+
+@keyframes beamFlow {
+  from { stroke-dashoffset: 2; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes electricFlicker {
+  0% { opacity: 0.7; stroke-width: 0.11; }
+  100% { opacity: 0.9; stroke-width: 0.13; }
 }
 
 .mini-edge {

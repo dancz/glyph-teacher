@@ -129,6 +129,7 @@ export default function HackScreen({ game }) {
         
         <div className="flex-1 flex-center w-full px-2">
             <GlyphGrid 
+              key={inputIndex}
               mode="input" 
               onInputEnd={handleInputEnd} 
               size="100%" 

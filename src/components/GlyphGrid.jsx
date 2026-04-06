@@ -48,7 +48,9 @@ export default function GlyphGrid({
   const [isDrawing, setIsDrawing] = useState(false);
   
   // Refs for tracking drawing securely and high-performance pointer updates
-  const activeLineRef = useRef(null);
+  const trailBeamRef = useRef(null);
+  const trailCoreRef = useRef(null);
+  const trailPointsRef = useRef([]);
   const ctmInverseRef = useRef(null);
   const lastNodeRef = useRef(null);
   const pointerCoordsRef = useRef({ x: 0, y: 0 });
@@ -118,6 +120,14 @@ export default function GlyphGrid({
       lastNodeRef.current = nodeIdx;
       setActiveNodes([nodeIdx]);
       setDrawnEdges([]);
+      
+      // Initialize trail from the starting node
+      const [nx, ny] = NODE_POS[nodeIdx];
+      const d = `M ${nx} ${ny}`;
+      trailPointsRef.current = [{x: nx, y: ny}];
+      if (trailBeamRef.current) trailBeamRef.current.setAttribute('d', d);
+      if (trailCoreRef.current) trailCoreRef.current.setAttribute('d', d);
+      
       e.target.setPointerCapture(e.pointerId);
     } else {
       ctmInverseRef.current = null;
@@ -131,11 +141,15 @@ export default function GlyphGrid({
     
     pointerCoordsRef.current = coords; // Save for render phase
     
-    // Direct DOM mutation for high-performance drawing (bypass React state)
-    if (activeLineRef.current) {
-        activeLineRef.current.setAttribute('x2', coords.x);
-        activeLineRef.current.setAttribute('y2', coords.y);
-    }
+    // Add point to trail and update DOM directly (no React re-render)
+    trailPointsRef.current.push(coords);
+    
+    // Build path string - limit density for performance if needed
+    // Simple path: M x1 y1 L x2 y2 ...
+    const d = trailPointsRef.current.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(' ');
+    
+    if (trailBeamRef.current) trailBeamRef.current.setAttribute('d', d);
+    if (trailCoreRef.current) trailCoreRef.current.setAttribute('d', d);
     
     const nodeIdx = findNearestNode(coords.x, coords.y, 0.25); // Better precision Snap
     if (nodeIdx !== -1) {
@@ -161,6 +175,13 @@ export default function GlyphGrid({
           if (exists) return prev;
           return [...prev, [a, b]];
         });
+
+        // Reset trail to start at the new node
+        const [nx, ny] = NODE_POS[nodeIdx];
+        trailPointsRef.current = [{x: nx, y: ny}];
+        const rd = `M ${nx} ${ny}`;
+        if (trailBeamRef.current) trailBeamRef.current.setAttribute('d', rd);
+        if (trailCoreRef.current) trailCoreRef.current.setAttribute('d', rd);
       }
     }
   };
@@ -170,6 +191,12 @@ export default function GlyphGrid({
     if (mode !== 'input' || !isDrawing) return;
     setIsDrawing(false);
     lastNodeRef.current = null;
+    trailPointsRef.current = [];
+    
+    // Clear trail visually
+    if (trailBeamRef.current) trailBeamRef.current.setAttribute('d', '');
+    if (trailCoreRef.current) trailCoreRef.current.setAttribute('d', '');
+    
     e.target.releasePointerCapture(e.pointerId);
     
     if (onInputEnd) {
@@ -213,6 +240,18 @@ export default function GlyphGrid({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
       >
+        <defs>
+          <linearGradient id="beamGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00e5ff" stopOpacity="1" />
+            <stop offset="50%" stopColor="#dcaaff" stopOpacity="1" />
+            <stop offset="100%" stopColor="#ffbe00" stopOpacity="1" />
+          </linearGradient>
+          <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="0.05" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+
         {/* Background hexagon guide */}
         {showGuides && (
           <polygon 
@@ -221,44 +260,66 @@ export default function GlyphGrid({
           />
         )}
 
-        {/* Drawn edges / Display edges */}
+        {/* Drawn edges / Display edges - Multi-layered for Ingress-fidelity */}
         {displayEdges.map((edge, idx) => {
           const [n1, n2] = edge;
           const p1 = NODE_POS[n1];
           const p2 = NODE_POS[n2];
+          const isDrawn = mode === 'input';
+          const lineClass = customLineClass || (mode === 'display' ? (mini ? 'mini-edge' : 'display-edge') : 'drawn-edge');
+          
           return (
-             <line 
-                key={idx} 
-                x1={p1[0]} y1={p1[1]} 
-                x2={p2[0]} y2={p2[1]} 
-                className={`glyph-edge ${customLineClass || (mode === 'display' ? (mini ? 'mini-edge' : 'display-edge') : 'drawn-edge')}`}
-             />
+            <g key={idx} className={`edge-group ${lineClass}`}>
+               {/* 1. Underlying wide glow */}
+               <line 
+                  x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
+                  className="edge-layer-glow"
+               />
+               {/* 2. Particle "Energy" layer - handled via dash-array in CSS */}
+               <line 
+                  x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
+                  className="edge-layer-particles"
+               />
+               {/* 3. Bright core center */}
+               <line 
+                  x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} 
+                  className="edge-layer-core"
+               />
+            </g>
           );
         })}
 
-        {/* Current drawing line */}
-        {isDrawing && activeNodes.length > 0 && (
-          <line
-            ref={activeLineRef}
-            x1={NODE_POS[activeNodes[activeNodes.length - 1]][0]}
-            y1={NODE_POS[activeNodes[activeNodes.length - 1]][1]}
-            x2={pointerCoordsRef.current.x} 
-            y2={pointerCoordsRef.current.y}
-            className="drawing-edge"
-          />
+        {/* Current drawing electric beam */}
+        {mode === 'input' && (
+          <g style={{ opacity: isDrawing ? 1 : 0, transition: 'opacity 0.2s' }}>
+            <path
+              ref={trailBeamRef}
+              className="drawing-beam"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              ref={trailCoreRef}
+              className="drawing-core"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </g>
         )}
 
-        {/* Nodes */}
+        {/* Nodes - Improved Fidelity */}
         {showNodes && NODE_POS.map((pos, idx) => {
           const isActive = activeNodes.includes(idx) || (mode === 'display' && displayEdges.some(e => e[0]===idx || e[1]===idx));
+          const rBase = mini ? 0.04 : 0.055;
           return (
-            <circle 
-              key={idx} 
-              cx={pos[0]} 
-              cy={pos[1]} 
-              r={mini ? "0.05" : "0.08"} 
-              className={`glyph-node ${mini ? 'mini-node' : ''} ${isActive ? 'active' : ''}`}
-            />
+            <g key={idx} className={`node-group ${mini ? 'mini-node' : ''} ${isActive ? 'active' : ''}`}>
+              {/* Outer halo blur */}
+              <circle cx={pos[0]} cy={pos[1]} r={rBase * 2.5} className="node-halo" />
+              {/* Center point */}
+              <circle cx={pos[0]} cy={pos[1]} r={rBase} className="node-core" />
+            </g>
           );
         })}
       </svg>
