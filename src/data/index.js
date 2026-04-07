@@ -18,21 +18,12 @@ export function getEdgesForWord(word) {
   return wordToEdges[parsedWord] || '';
 }
 
-export function getRandomSequence(level) {
-  // L1 portal - 1 glyph (level 1-2 often has 1-2 glyphs, but the original script mapped levels to difficulty bounds)
-  // Let's map L1->1, L2->2, L3->3, etc. or just randomly pick from sequences matching the level bounds.
-  // levels array in sequences.json contains [0], [2], [5], [7], [8].
-  // Usually: 
-  // L1: [0] -> 1 glyph
-  // L2: [2] -> 2 glyphs
-  // L6: [5] -> 3 or 4 glyphs
-  // L7: [7] -> 4 or 5 glyphs
-  // L8: [8] -> 5 glyphs
+export function getRandomSequence(length) {
   let targetSet = 0;
-  if(level >= 8) targetSet = 8; // 5 glyphs
-  else if(level >= 6) targetSet = 7; // 4 glyphs
-  else if(level >= 3) targetSet = 5; // 3 glyphs
-  else if(level >= 2) targetSet = 2; // 2 glyphs
+  if(length >= 5) targetSet = 8; // 5 glyphs
+  else if(length === 4) targetSet = 7; // 4 glyphs
+  else if(length === 3) targetSet = 5; // 3 glyphs
+  else if(length === 2) targetSet = 2; // 2 glyphs
   else targetSet = 0; // 1 glyph
 
   const validSequences = sequencesData.filter(s => s.levels.includes(targetSet));
@@ -43,6 +34,7 @@ export function getRandomSequence(level) {
 
   const seq = validSequences[Math.floor(Math.random() * validSequences.length)];
   return {
+    id: seq.words.join('|').toLowerCase(),
     words: seq.words,
     edges: seq.words.map(w => getEdgesForWord(w)).filter(e => e)
   };
@@ -54,10 +46,10 @@ export { glyphsData, sequencesData };
  * Returns all sequences with a stable string ID for progress tracking.
  * Optionally filter by level (1-8).
  */
-export function getAllSequences(level = null) {
+export function getAllSequences(length = null) {
   let seqs = sequencesData;
-  if (level !== null) {
-    const targetSet = level >= 8 ? 8 : level >= 6 ? 7 : level >= 3 ? 5 : level >= 2 ? 2 : 0;
+  if (length !== null) {
+    const targetSet = length >= 5 ? 8 : length === 4 ? 7 : length === 3 ? 5 : length === 2 ? 2 : 0;
     seqs = seqs.filter(s => s.levels.includes(targetSet));
   }
   return seqs.map(seq => ({

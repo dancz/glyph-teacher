@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getRandomSequence } from '../data';
+import { recordResult } from '../services/progressService';
+import { addScore } from '../services/scoreService';
 
 export const GAME_STATES = {
   IDLE: 'IDLE',
@@ -26,7 +28,7 @@ function compareGlyphs(expectedEdgeStr, actualEdgeStr) {
 
 export function useGlyphGame() {
   const [gameState, setGameState] = useState(GAME_STATES.IDLE);
-  const [level, setLevel] = useState(8);
+  const [level, setLevel] = useState(5);
   const [sequence, setSequence] = useState({ words: [], edges: [] });
   
   // Display state
@@ -128,11 +130,23 @@ export function useGlyphGame() {
     });
 
     const speedBonus = correctCount === expectedEdges.length ? Math.floor((timeLeft / totalTime) * 100) : 0;
+    const hackingBonus = Math.floor((correctCount / expectedEdges.length) * 100);
     
+    // Add percentage success (hackingBonus) to score calculation
+    const finalScore = (correctCount * level * 50) + speedBonus + hackingBonus;
+    
+    // Track stats even if final score is somehow 0, to make sure percentages update accurately
+    addScore(level, Math.max(0, finalScore), correctCount, expectedEdges.length);
+    
+    if (sequence.id) {
+      recordResult(sequence.id, correctCount === expectedEdges.length, expectedEdges, flags, 'visual');
+    }
+
     setResults({
       correct: correctCount,
       total: expectedEdges.length,
       speedBonus,
+      score: finalScore,
       flags
     });
     setDisplayIndex(0);

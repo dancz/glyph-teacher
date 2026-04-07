@@ -177,13 +177,13 @@ export default function TrainingScreen() {
 
           {/* Level filter */}
           <div style={{ marginBottom: '20px' }}>
-            <div className="font-orbitron" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>FILTER BY LEVEL</div>
+            <div className="font-orbitron" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>FILTER BY SEQUENCE LENGTH</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px' }}>
               <button className="btn-primary" style={{ padding: '5px 10px', fontSize: '0.75rem', opacity: levelFilter === null ? 1 : 0.5 }}
                 onClick={() => refreshSummary(null)}>ALL</button>
-              {[1,2,3,4,5,6,7,8].map(l => (
+              {[1, 2, 3, 4, 5].map(l => (
                 <button key={l} className="btn-primary" style={{ padding: '5px 10px', fontSize: '0.75rem', opacity: levelFilter === l ? 1 : 0.5 }}
-                  onClick={() => refreshSummary(l)}>L{l}</button>
+                  onClick={() => refreshSummary(l)}>{l}</button>
               ))}
           </div>
           </div>

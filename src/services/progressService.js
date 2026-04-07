@@ -31,6 +31,26 @@ export function getAllProgress() {
   return load(SEQ_KEY);
 }
 
+export function getAllGlyphProgress() {
+  return load(GLYPH_KEY);
+}
+
+export function toggleKnownWell(id, type, isKnown) {
+  const key = type === 'sequence' ? SEQ_KEY : GLYPH_KEY;
+  const data = load(key);
+  if (!data[id]) data[id] = {};
+  data[id].knownWell = isKnown;
+  save(key, data);
+}
+
+export function getStatSummary(itemData) {
+  if (!itemData) return { attempts: 0, correct: 0, pct: null, knownWell: false };
+  const attempts = MODES.reduce((sum, m) => sum + (itemData[m]?.attempts || 0), 0);
+  const correct = MODES.reduce((sum, m) => sum + (itemData[m]?.correct || 0), 0);
+  const pct = attempts > 0 ? Math.floor((correct / attempts) * 100) : null;
+  return { attempts, correct, pct, knownWell: !!itemData.knownWell };
+}
+
 /**
  * Record a full-sequence result, keyed by mode.
  * Also updates per-glyph records for the same mode.
@@ -82,10 +102,12 @@ export function pickNextSequence(sequences, mode = 'visual') {
   const glyphAll = load(GLYPH_KEY);
 
   const weighted = sequences.map(seq => {
-    const seqWeight = getModeRecord(seqAll[seq.id], mode).weight;
+    const seqData = seqAll[seq.id] || {};
+    const seqWeight = seqData.knownWell ? 0.001 : getModeRecord(seqData, mode).weight;
 
     const maxGlyphWeight = seq.edges.reduce((max, edge) => {
-      const gw = getModeRecord(glyphAll[edge], mode).weight;
+      const gData = glyphAll[edge] || {};
+      const gw = gData.knownWell ? 0.001 : getModeRecord(gData, mode).weight;
       return Math.max(max, gw);
     }, 0);
 
