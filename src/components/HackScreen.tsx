@@ -206,6 +206,15 @@ export default function HackScreen({ game }: { game: any }) {
                   <span className="font-orbitron text-sm mb-2" style={{ color: '#a0bdff', letterSpacing: '0.05em' }}>SPEED BONUS:</span>
                   <span className="font-orbitron font-bold text-4xl" style={{ color: '#dcaaff' }}>{results.speedBonus}%</span>
               </div>
+              {results.comboBonus > 0 && (
+                <>
+                  <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent 5%, rgba(180, 150, 255, 0.4) 50%, transparent 95%)', margin: '20px 0' }}></div>
+                  <div className="flex flex-column text-center mt-6">
+                      <span className="font-orbitron text-sm mb-2" style={{ color: '#a0bdff', letterSpacing: '0.05em' }}>COMBO BONUS:</span>
+                      <span className="font-orbitron font-bold text-4xl" style={{ color: '#dcaaff' }}>+{results.comboBonus}%</span>
+                  </div>
+                </>
+              )}
               {results.score > 0 && (
                 <>
                   <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent 5%, rgba(180, 150, 255, 0.4) 50%, transparent 95%)', margin: '20px 0' }}></div>

@@ -39,12 +39,16 @@ export function useGlyphGame() {
   const timerRef = useRef<any>(null);
   const finishTimeoutRef = useRef<any>(null);
   
-  // Results
-  const [results, setResults] = useState<any>({ correct: 0, total: 0, speedBonus: 0 });
+  // Combo and Results
+  const [combo, setCombo] = useState(0);
+  const [results, setResults] = useState<any>({ correct: 0, total: 0, speedBonus: 0, comboBonus: 0, score: 0, flags: [] });
 
   const startGame = useCallback((lvl) => {
+    setLevel(prevLvl => {
+      if (prevLvl !== lvl) setCombo(0);
+      return lvl;
+    });
     const seq = getRandomSequence(lvl);
-    setLevel(lvl);
     setSequence(seq);
     setGameState(GAME_STATES.PREPARE);
     setUserInputs([]);
@@ -56,6 +60,7 @@ export function useGlyphGame() {
   }, []);
 
   const stopGame = useCallback(() => {
+    setCombo(0);
     setGameState(GAME_STATES.IDLE);
     clearInterval(timerRef.current);
     if (finishTimeoutRef.current) clearTimeout(finishTimeoutRef.current);
@@ -130,11 +135,25 @@ export function useGlyphGame() {
       }
     });
 
-    const speedBonus = correctCount === expectedEdges.length ? Math.floor((timeLeft / totalTime) * 100) : 0;
-    const hackingBonus = Math.floor((correctCount / expectedEdges.length) * 100);
+    const speedBonusPercentage = correctCount === expectedEdges.length ? Math.floor((timeLeft / totalTime) * 100) : 0;
+
+    // SCORING
+    const sequenceMultiplier = Math.pow(2, expectedEdges.length - 1);
+    const baseScore = correctCount * sequenceMultiplier * 5;
+    const speedBonusPoints = Math.floor((speedBonusPercentage / 100) * baseScore);
     
-    // Add percentage success (hackingBonus) to score calculation
-    const finalScore = (correctCount * level * 50) + speedBonus + hackingBonus;
+    let baseFinalScore = baseScore + speedBonusPoints;
+    
+    // Apply 50% penalty if the sequence is not completely correct
+    if (correctCount < expectedEdges.length) {
+      baseFinalScore = Math.floor(baseFinalScore * 0.5);
+    }
+    
+    const comboBonusPoints = Math.floor(baseFinalScore * (combo / 100));
+    const finalScore = baseFinalScore + comboBonusPoints;
+    
+    // Update combo sequence: +1 if fully correct, reset to 0 otherwise
+    const nextCombo = correctCount === expectedEdges.length ? Math.min(50, combo + 1) : 0;
     
     // Track stats even if final score is somehow 0, to make sure percentages update accurately
     addScore(level, Math.max(0, finalScore), correctCount, expectedEdges.length);
@@ -146,10 +165,13 @@ export function useGlyphGame() {
     setResults({
       correct: correctCount,
       total: expectedEdges.length,
-      speedBonus,
+      speedBonus: speedBonusPercentage,
+      comboBonus: combo,
       score: finalScore,
       flags
     });
+    
+    setCombo(nextCombo);
     setDisplayIndex(0);
     setGameState(GAME_STATES.RESULTS);
   };
