@@ -79,7 +79,7 @@ export default function GlyphGrid({
     return { x: svgP.x, y: svgP.y };
   };
 
-  const findNearestNode = (x, y, threshold = 0.25) => {
+  const findNearestNode = (x, y, threshold = 0.15) => {
     let nearestIdx = -1;
     let minDist = Infinity;
     
@@ -150,7 +150,7 @@ export default function GlyphGrid({
     if (trailBeamRef.current) trailBeamRef.current.setAttribute('d', d);
     if (trailCoreRef.current) trailCoreRef.current.setAttribute('d', d);
     
-    const nodeIdx = findNearestNode(coords.x, coords.y, 0.25); // Better precision Snap
+    const nodeIdx = findNearestNode(coords.x, coords.y, 0.15); // Better precision Snap
     if (nodeIdx !== -1) {
       const lastNode = lastNodeRef.current;
       if (lastNode !== nodeIdx) {
