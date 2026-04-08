@@ -15,7 +15,9 @@ export default function HackScreen({ game }: { game: any }) {
     stopGame,
     handleInputEnd,
     handleSkip,
-    handleRedo
+    handleRedo,
+    startGame,
+    level
   } = game;
 
   const [hexagonsContent, setHexagonsContent] = useState<any[]>([]);
@@ -217,7 +219,8 @@ export default function HackScreen({ game }: { game: any }) {
         </div>
 
         {/* Footer: always at the bottom of screen-container, never moves */}
-        <div className="screen-footer">
+        <div className="screen-footer" style={{ justifyContent: 'center', gap: '20px' }}>
+          <button onClick={() => startGame(level)} className="btn-secondary" style={{ borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' }}>Next</button>
           <button onClick={stopGame} className="btn-secondary">Done</button>
         </div>
       </>
