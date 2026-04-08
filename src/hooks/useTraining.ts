@@ -2,14 +2,10 @@ import { useState, useCallback, useRef } from 'react';
 import { getAllSequences } from '../data';
 import { pickNextSequence, recordResult, getProgressSummary } from '../services/progressService';
 
-export const TRAINING_STATES = {
-  IDLE: 'IDLE',
-  DISPLAYING: 'DISPLAYING',
-  INPUT: 'INPUT',
-  FEEDBACK: 'FEEDBACK',
-};
+import { TRAINING_STATES, AppState } from '../constants';
 
-function parseEdges(edgeStr) {
+
+function parseEdges(edgeStr: string) {
   if (!edgeStr) return [];
   const edges = [];
   for (let i = 1; i < edgeStr.length; i += 2) {
@@ -20,9 +16,9 @@ function parseEdges(edgeStr) {
   return edges;
 }
 
-function compareGlyphs(expectedEdgeStr, actualEdgeStr) {
-  const normalize = (str) => {
-    let edges = [];
+function compareGlyphs(expectedEdgeStr: string, actualEdgeStr: string) {
+  const normalize = (str: string) => {
+    let edges: string[] = [];
     for (let i = 0; i < str.length; i += 2) {
       let a = str[i], b = str[i + 1];
       edges.push(a < b ? a + b : b + a);
@@ -34,8 +30,8 @@ function compareGlyphs(expectedEdgeStr, actualEdgeStr) {
 }
 
 export function useTraining() {
-  const [state, setState] = useState(TRAINING_STATES.IDLE);
-  const [levelFilter, setLevelFilter] = useState(null);
+  const [state, setState] = useState<AppState>(TRAINING_STATES.IDLE);
+  const [levelFilter, setLevelFilter] = useState<number | null>(null);
   const [trainingMode, setTrainingMode] = useState('visual'); // 'visual' | 'text'
   const [currentSeq, setCurrentSeq] = useState(null);
   const [displayIndex, setDisplayIndex] = useState(0);
@@ -48,14 +44,14 @@ export function useTraining() {
   const displayTimerRef = useRef(null);
   const feedbackTimerRef = useRef(null);
 
-  const refreshSummary = useCallback((lvl) => {
+  const refreshSummary = useCallback((lvl?: number | null) => {
     const newLevel = lvl !== undefined ? lvl : levelFilter;
     if (lvl !== undefined) setLevelFilter(lvl);
     const seqs = getAllSequences(newLevel);
     setSummary(getProgressSummary(seqs));
   }, [levelFilter]);
 
-  const startSession = useCallback((lvl = levelFilter, mode = trainingMode) => {
+  const startSession = useCallback((lvl: number | null = levelFilter, mode: string = trainingMode) => {
     clearTimeout(feedbackTimerRef.current);
     setLevelFilter(lvl);
     setTrainingMode(mode);

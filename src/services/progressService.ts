@@ -1,27 +1,24 @@
-const SEQ_KEY   = 'glyph_trainer_progress';
-const GLYPH_KEY = 'glyph_trainer_glyphs';
-
-const MODES = ['visual', 'text', 'level'];
+import { SEQ_KEY, GLYPH_KEY, MODES, DEFAULT_RECORD, GLYPH_BOOST } from '../constants';
 
 // ─── Generic storage helpers ──────────────────────────────────────────────────
-function load(key) {
-  try { return JSON.parse(localStorage.getItem(key)) ?? {}; }
+function load(key: string): any {
+  try { return JSON.parse(localStorage.getItem(key) || 'null') ?? {}; }
   catch { return {}; }
 }
-function save(key, data) {
+function save(key: string, data: any) {
   try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
 }
 
 // ─── SRS weight helpers ───────────────────────────────────────────────────────
-const DEFAULT_RECORD = { weight: 1.0, attempts: 0, correct: 0 };
 
-function updatedWeight(prev, wasCorrect) {
+
+function updatedWeight(prev: any, wasCorrect: boolean) {
   return wasCorrect
     ? Math.max(0.1, prev.weight * 0.6)
     : Math.min(8.0, prev.weight * 2.0);
 }
 
-function getModeRecord(obj, mode) {
+function getModeRecord(obj: any, mode: string) {
   return obj?.[mode] ?? { ...DEFAULT_RECORD };
 }
 
@@ -35,7 +32,7 @@ export function getAllGlyphProgress() {
   return load(GLYPH_KEY);
 }
 
-export function toggleKnownWell(id, type, isKnown) {
+export function toggleKnownWell(id: string, type: string, isKnown: boolean) {
   const key = type === 'sequence' ? SEQ_KEY : GLYPH_KEY;
   const data = load(key);
   if (!data[id]) data[id] = {};
@@ -43,7 +40,7 @@ export function toggleKnownWell(id, type, isKnown) {
   save(key, data);
 }
 
-export function getStatSummary(itemData) {
+export function getStatSummary(itemData: any) {
   if (!itemData) return { attempts: 0, correct: 0, pct: null, knownWell: false };
   const attempts = MODES.reduce((sum, m) => sum + (itemData[m]?.attempts || 0), 0);
   const correct = MODES.reduce((sum, m) => sum + (itemData[m]?.correct || 0), 0);
@@ -61,7 +58,7 @@ export function getStatSummary(itemData) {
  * @param {boolean[]} flags     - per-glyph correctness
  * @param {string}   mode       - 'visual' | 'text'
  */
-export function recordResult(seqId, wasCorrect, edges = [], flags = [], mode = 'visual') {
+export function recordResult(seqId: string, wasCorrect: boolean, edges: string[] = [], flags: boolean[] = [], mode: string = 'visual') {
   // ── Sequence record ──
   const seqAll = load(SEQ_KEY);
   if (!seqAll[seqId]) seqAll[seqId] = {};
@@ -92,12 +89,12 @@ export function recordResult(seqId, wasCorrect, edges = [], flags = [], mode = '
 }
 
 // ─── Sequence picker with glyph-weakness boost ───────────────────────────────
-const GLYPH_BOOST = 0.5;
+
 
 /**
  * Pick next sequence using weighted random, using mode-specific weights.
  */
-export function pickNextSequence(sequences, mode = 'visual') {
+export function pickNextSequence(sequences: any[], mode: string = 'visual') {
   const seqAll   = load(SEQ_KEY);
   const glyphAll = load(GLYPH_KEY);
 
@@ -129,7 +126,7 @@ export function pickNextSequence(sequences, mode = 'visual') {
  * Returns { total, mastered, learning, unseen } using WORST weight across modes.
  * A sequence is mastered only if it's mastered in BOTH modes that have been used.
  */
-export function getProgressSummary(sequences) {
+export function getProgressSummary(sequences: any[]) {
   const seqAll = load(SEQ_KEY);
   let mastered = 0, learning = 0, unseen = 0;
 
@@ -150,7 +147,7 @@ export function getProgressSummary(sequences) {
 /**
  * Returns the N weakest individual glyphs for a given mode (or combined).
  */
-export function getWeakGlyphs(n = 5, mode = null) {
+export function getWeakGlyphs(n: number = 5, mode: string | null = null) {
   const all = load(GLYPH_KEY);
 
   return Object.entries(all)

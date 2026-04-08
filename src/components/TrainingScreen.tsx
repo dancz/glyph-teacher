@@ -1,47 +1,45 @@
 import React, { useEffect, useCallback } from 'react';
-import { useTraining, TRAINING_STATES } from '../hooks/useTraining';
+import { useTraining } from '../hooks/useTraining';
+import { TRAINING_STATES, TRAINING_RADIUS, TRAINING_CIRC, TRAINING_SEG_OFFSET, HEX_PTS } from '../constants';
 import { getAllSequences } from '../data';
 import { getProgressSummary, resetProgress, getWeakGlyphs } from '../services/progressService';
 import GlyphGrid from './GlyphGrid';
 
 // ─── Progress ring component ──────────────────────────────────────────────────
-function ProgressRing({ mastered, learning, unseen, total }) {
+function ProgressRing({ mastered, learning, unseen, total }: any) {
   if (!total) return null;
-  const RADIUS = 54;
-  const CIRC = 2 * Math.PI * RADIUS;
   const masteredPct = (mastered / total);
   const learningPct = (learning / total);
   const unseenPct = (unseen / total);
 
-  const masteredLen = CIRC * masteredPct;
-  const learningLen = CIRC * learningPct;
-  const unseenLen   = CIRC * unseenPct;
+  const masteredLen = TRAINING_CIRC * masteredPct;
+  const learningLen = TRAINING_CIRC * learningPct;
+  const unseenLen   = TRAINING_CIRC * unseenPct;
 
   // Segments drawn sequentially via strokeDashoffset rotation
-  const SEG_OFFSET = -Math.PI / 2; // start at top
-  const masteredOff = CIRC * (1 - masteredPct);
-  const learningOff = CIRC * (1 - learningPct) - masteredLen;
+  const masteredOff = TRAINING_CIRC * (1 - masteredPct);
+  const learningOff = TRAINING_CIRC * (1 - learningPct) - masteredLen;
   const unseenOff   = -(masteredLen + learningLen);
 
   return (
     <div style={{ position: 'relative', width: 140, height: 140 }}>
       <svg width="140" height="140" viewBox="0 0 140 140">
         {/* Background track */}
-        <circle cx="70" cy="70" r={RADIUS} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" />
+        <circle cx="70" cy="70" r={TRAINING_RADIUS} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" />
         {/* Unseen */}
-        <circle cx="70" cy="70" r={RADIUS} fill="none" stroke="rgba(180,160,255,0.2)" strokeWidth="12"
-          strokeDasharray={`${unseenLen} ${CIRC - unseenLen}`}
-          strokeDashoffset={CIRC * 0.25 - masteredLen - learningLen}
+        <circle cx="70" cy="70" r={TRAINING_RADIUS} fill="none" stroke="rgba(180,160,255,0.2)" strokeWidth="12"
+          strokeDasharray={`${unseenLen} ${TRAINING_CIRC - unseenLen}`}
+          strokeDashoffset={TRAINING_CIRC * 0.25 - masteredLen - learningLen}
           style={{ transform: 'rotate(-90deg)', transformOrigin: '70px 70px' }} />
         {/* Learning */}
-        <circle cx="70" cy="70" r={RADIUS} fill="none" stroke="#dcaaff" strokeWidth="12"
-          strokeDasharray={`${learningLen} ${CIRC - learningLen}`}
-          strokeDashoffset={CIRC * 0.25 - masteredLen}
+        <circle cx="70" cy="70" r={TRAINING_RADIUS} fill="none" stroke="#dcaaff" strokeWidth="12"
+          strokeDasharray={`${learningLen} ${TRAINING_CIRC - learningLen}`}
+          strokeDashoffset={TRAINING_CIRC * 0.25 - masteredLen}
           style={{ transform: 'rotate(-90deg)', transformOrigin: '70px 70px' }} />
         {/* Mastered */}
-        <circle cx="70" cy="70" r={RADIUS} fill="none" stroke="#00e5ff" strokeWidth="12"
-          strokeDasharray={`${masteredLen} ${CIRC - masteredLen}`}
-          strokeDashoffset={CIRC * 0.25}
+        <circle cx="70" cy="70" r={TRAINING_RADIUS} fill="none" stroke="#00e5ff" strokeWidth="12"
+          strokeDasharray={`${masteredLen} ${TRAINING_CIRC - masteredLen}`}
+          strokeDashoffset={TRAINING_CIRC * 0.25}
           style={{ transform: 'rotate(-90deg)', transformOrigin: '70px 70px', filter: 'drop-shadow(0 0 6px #00e5ff)' }} />
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -53,8 +51,7 @@ function ProgressRing({ mastered, learning, unseen, total }) {
 }
 
 // ─── Hexagon row for training display ────────────────────────────────────────
-function TrainingHexRow({ sequence, displayIndex, inputIndex, feedbackFlags, phase }) {
-  const HEX_PTS = "50,5 95,28 95,72 50,95 5,72 5,28";
+function TrainingHexRow({ sequence, displayIndex, inputIndex, feedbackFlags, phase }: any) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 12, margin: '12px 0' }}>
       {sequence.words.map((_, i) => {
@@ -199,14 +196,14 @@ export default function TrainingScreen() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
                   {weak.map((g, i) => {
-                    const vm = g.modeData?.visual;
-                    const tm = g.modeData?.text;
+                    const vm = (g.modeData as any)?.visual;
+                    const tm = (g.modeData as any)?.text;
                     return (
                       <div key={i} style={{ textAlign: 'center' }}>
                         <div style={{ width: 50, height: 50, position: 'relative',
                           border: `1px solid rgba(255,68,120,${0.3 + (g.weight / 8) * 0.5})`,
                           borderRadius: '6px', background: 'rgba(255,20,60,0.05)' }}>
-                          <GlyphGrid mode="display" glyphStr={g.edgeStr} size="100%" showGuides={false} mini={true} showNodes={true} customLineClass="display-edge" />
+                          <GlyphGrid mode="display" glyphStr={g.edgeStr} size="100%" mini={true} showNodes={true} customLineClass="display-edge" />
                         </div>
                         {vm?.attempts > 0 && (
                           <div style={{ fontSize: '0.5rem', color: '#00e5ff', marginTop: '2px' }}>

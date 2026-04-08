@@ -1,4 +1,5 @@
-const WEEKLY_SCORE_KEY = 'glyph_trainer_weekly_score';
+import { WEEKLY_SCORE_KEY } from '../constants';
+
 
 export function getWeekId() {
   const d = new Date();
@@ -24,7 +25,7 @@ export function getWeeklyScores() {
   }
 }
 
-export function addScore(level, score, correctCount = 0, totalCount = 0) {
+export function addScore(level: number, score: number, correctCount: number = 0, totalCount: number = 0) {
   const scores = getWeeklyScores();
   const levelKey = `L${level}`;
   

@@ -3,19 +3,14 @@ import { getRandomSequence } from '../data';
 import { recordResult } from '../services/progressService';
 import { addScore } from '../services/scoreService';
 
-export const GAME_STATES = {
-  IDLE: 'IDLE',
-  PREPARE: 'PREPARE',
-  DISPLAYING: 'DISPLAYING',
-  INPUT: 'INPUT',
-  RESULTS: 'RESULTS'
-};
+import { GAME_STATES, AppState } from '../constants';
+
 
 // Check if two sequences of edges are identical, handling edge reversibility
-function compareGlyphs(expectedEdgeStr, actualEdgeStr) {
+function compareGlyphs(expectedEdgeStr: string, actualEdgeStr: string) {
   // We represent an edge as an ordered pair "ab" where a < b
-  const normalize = (str) => {
-    let edges = [];
+  const normalize = (str: string) => {
+    let edges: string[] = [];
     for(let i=0; i<str.length; i+=2) {
       let a = str[i], b = str[i+1];
       edges.push(a < b ? a+b : b+a);
@@ -27,9 +22,9 @@ function compareGlyphs(expectedEdgeStr, actualEdgeStr) {
 }
 
 export function useGlyphGame() {
-  const [gameState, setGameState] = useState(GAME_STATES.IDLE);
+  const [gameState, setGameState] = useState<AppState>(GAME_STATES.IDLE);
   const [level, setLevel] = useState(5);
-  const [sequence, setSequence] = useState({ words: [], edges: [] });
+  const [sequence, setSequence] = useState<any>({ words: [], edges: [] });
   
   // Display state
   const [displayIndex, setDisplayIndex] = useState(0);
@@ -44,7 +39,7 @@ export function useGlyphGame() {
   const timerRef = useRef(null);
   
   // Results
-  const [results, setResults] = useState({ correct: 0, total: 0, speedBonus: 0 });
+  const [results, setResults] = useState<any>({ correct: 0, total: 0, speedBonus: 0 });
 
   const startGame = useCallback((lvl) => {
     const seq = getRandomSequence(lvl);
@@ -115,8 +110,8 @@ export function useGlyphGame() {
     }
   }, [gameState, displayIndex, sequence.words.length, userInputs, sequence.edges]);
 
-  const finishGame = (inputs, expectedEdges) => {
-    clearInterval(timerRef.current);
+  const finishGame = (inputs: any[], expectedEdges: any[]) => {
+    clearInterval(timerRef.current!);
     
     let correctCount = 0;
     let flags = [];

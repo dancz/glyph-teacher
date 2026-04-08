@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import GlyphGrid from './GlyphGrid';
+import { HEX_PTS } from '../constants';
 
-export default function HackScreen({ game }) {
+export default function HackScreen({ game }: { game: any }) {
   const {
     gameState,
     sequence,
@@ -17,11 +18,11 @@ export default function HackScreen({ game }) {
     handleRedo
   } = game;
 
-  const [hexagonsContent, setHexagonsContent] = useState([]);
+  const [hexagonsContent, setHexagonsContent] = useState<any[]>([]);
 
   // Provide rendering elements based on state
   useEffect(() => {
-    let hexes = [];
+    let hexes: any[] = [];
     for (let i = 0; i < sequence.words.length; i++) {
         let status = 'normal';
         let glyphStr = '';
@@ -75,7 +76,6 @@ export default function HackScreen({ game }) {
   };
 
   const renderHexagonsRow = () => {
-      const HEX_PTS = "50,5 95,28 95,72 50,95 5,72 5,28";
       return (
           <div className="flex-center my-4 w-full" style={{ gap: '10px', flexWrap: 'wrap' }}>
               {hexagonsContent.map((h, i) => (

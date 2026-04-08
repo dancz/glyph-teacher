@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useGlyphGame, GAME_STATES } from './hooks/useGlyphGame';
+import { useGlyphGame } from './hooks/useGlyphGame';
+import { GAME_STATES } from './constants';
 import { getWeeklyScores } from './services/scoreService';
 import HackScreen from './components/HackScreen';
 import GlyphDictionary from './components/GlyphDictionary';

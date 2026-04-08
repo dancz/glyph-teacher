@@ -1,23 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './GlyphGrid.css';
 
-const RT3 = Math.sqrt(3);
-const NODE_POS = [
-  [0, -1], [RT3 / 2, -1 / 2], [RT3 / 2, 1 / 2], [0, 1], [-RT3 / 2, 1 / 2], [-RT3 / 2, -1 / 2],
-  [RT3 / 4, -1 / 4], [RT3 / 4, 1 / 4], [-RT3 / 4, 1 / 4], [-RT3 / 4, -1 / 4],
-  [0, 0]
-];
-
-// Hexagon boundary
-const HEXAGON_PTS = [
-  [0, -1], [RT3 / 2, -1 / 2], [RT3 / 2, 1 / 2], [0, 1], [-RT3 / 2, 1 / 2], [-RT3 / 2, -1 / 2]
-].map(p => `${p[0]},${p[1]}`).join(' ');
+import { RT3, NODE_POS, HEXAGON_PTS, SNAP_THRESHOLD, MINI_NODE_RADIUS, STD_NODE_RADIUS } from '../constants';
 
 /**
  * Parses an edge string (e.g. "0112" -> [[0,1], [1,2]])
  * or handles arrays of edges.
  */
-function parseEdges(edgeStr) {
+function parseEdges(edgeStr: string | any[]) {
   if (!edgeStr) return [];
   if (Array.isArray(edgeStr)) return edgeStr; // already parsed
   const edges = [];
@@ -38,6 +28,14 @@ export default function GlyphGrid({
   mini = false,
   customLineClass = '',
   showNodes = !mini
+}: {
+  mode?: 'display' | 'input';
+  glyphStr?: string | any[];
+  onInputEnd?: (str: string, edges: any[], nodes: number[]) => void;
+  size?: number | string;
+  mini?: boolean;
+  customLineClass?: string;
+  showNodes?: boolean;
 }) {
   const svgRef = useRef(null);
   
@@ -57,7 +55,7 @@ export default function GlyphGrid({
   // Derived display edges depending on mode
   const displayEdges = mode === 'display' ? parseEdges(glyphStr) : drawnEdges;
 
-  const getPointerCoords = (e) => {
+  const getPointerCoords = (e: any) => {
     if (!svgRef.current) return null;
     
     let ctmInv = ctmInverseRef.current;
@@ -79,7 +77,7 @@ export default function GlyphGrid({
     return { x: svgP.x, y: svgP.y };
   };
 
-  const findNearestNode = (x, y, threshold = 0.15) => {
+  const findNearestNode = (x: number, y: number, threshold = SNAP_THRESHOLD) => {
     let nearestIdx = -1;
     let minDist = Infinity;
     
@@ -96,7 +94,7 @@ export default function GlyphGrid({
     return -1;
   };
 
-  const handlePointerDown = (e) => {
+  const handlePointerDown = (e: any) => {
     if (mode !== 'input') return;
     
     // Cache CTM on pointer down to avoid layout thrashing during drawing
@@ -133,7 +131,7 @@ export default function GlyphGrid({
     }
   };
 
-  const handlePointerMove = (e) => {
+  const handlePointerMove = (e: any) => {
     if (mode !== 'input' || !isDrawing) return;
     const coords = getPointerCoords(e);
     if (!coords) return;
@@ -150,7 +148,7 @@ export default function GlyphGrid({
     if (trailBeamRef.current) trailBeamRef.current.setAttribute('d', d);
     if (trailCoreRef.current) trailCoreRef.current.setAttribute('d', d);
     
-    const nodeIdx = findNearestNode(coords.x, coords.y, 0.15); // Better precision Snap
+    const nodeIdx = findNearestNode(coords.x, coords.y, SNAP_THRESHOLD); // Better precision Snap
     if (nodeIdx !== -1) {
       const lastNode = lastNodeRef.current;
       if (lastNode !== nodeIdx) {
@@ -185,7 +183,7 @@ export default function GlyphGrid({
     }
   };
 
-  const handlePointerUp = (e) => {
+  const handlePointerUp = (e: any) => {
     ctmInverseRef.current = null; // Clear CTM cache
     if (mode !== 'input' || !isDrawing) return;
     setIsDrawing(false);
@@ -212,7 +210,7 @@ export default function GlyphGrid({
     }
   };
 
-  const handlePointerCancel = (e) => {
+  const handlePointerCancel = (e: any) => {
     if (isDrawing) handlePointerUp(e);
   };
 
@@ -304,7 +302,7 @@ export default function GlyphGrid({
         {/* Nodes - Improved Fidelity */}
         {showNodes && NODE_POS.map((pos, idx) => {
           const isActive = activeNodes.includes(idx) || (mode === 'display' && displayEdges.some(e => e[0]===idx || e[1]===idx));
-          const rBase = mini ? 0.04 : 0.055;
+          const rBase = mini ? MINI_NODE_RADIUS : STD_NODE_RADIUS;
           return (
             <g key={idx} className={`node-group ${mini ? 'mini-node' : ''} ${isActive ? 'active' : ''}`}>
               {/* Layer 1: Wide faint halo */}
