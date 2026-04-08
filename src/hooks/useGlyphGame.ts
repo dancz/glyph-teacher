@@ -36,7 +36,8 @@ export function useGlyphGame() {
   // Timer state
   const [timeLeft, setTimeLeft] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
-  const timerRef = useRef(null);
+  const timerRef = useRef<any>(null);
+  const finishTimeoutRef = useRef<any>(null);
   
   // Results
   const [results, setResults] = useState<any>({ correct: 0, total: 0, speedBonus: 0 });
@@ -57,6 +58,7 @@ export function useGlyphGame() {
   const stopGame = useCallback(() => {
     setGameState(GAME_STATES.IDLE);
     clearInterval(timerRef.current);
+    if (finishTimeoutRef.current) clearTimeout(finishTimeoutRef.current);
   }, []);
 
   // Effect for handling state transitions
@@ -112,6 +114,10 @@ export function useGlyphGame() {
 
   const finishGame = (inputs: any[], expectedEdges: any[]) => {
     clearInterval(timerRef.current!);
+    if (finishTimeoutRef.current) {
+      clearTimeout(finishTimeoutRef.current);
+      finishTimeoutRef.current = null;
+    }
     
     let correctCount = 0;
     let flags = [];
@@ -149,21 +155,32 @@ export function useGlyphGame() {
   };
 
   const handleInputEnd = (inputEdgeStr) => {
+    if (userInputs.length >= sequence.words.length) return;
+
     const newInputs = [...userInputs, inputEdgeStr];
     setUserInputs(newInputs);
+    setInputIndex(newInputs.length);
     
     if (newInputs.length >= sequence.words.length) {
-      finishGame(newInputs, sequence.edges);
-    } else {
-      setInputIndex(newInputs.length);
+      finishTimeoutRef.current = setTimeout(() => {
+        finishGame(newInputs, sequence.edges);
+      }, 2000);
     }
   };
 
   const handleSkip = () => {
+    if (finishTimeoutRef.current) {
+      clearTimeout(finishTimeoutRef.current);
+      finishTimeoutRef.current = null;
+    }
     finishGame(userInputs, sequence.edges);
   };
 
   const handleRedo = () => {
+    if (finishTimeoutRef.current) {
+      clearTimeout(finishTimeoutRef.current);
+      finishTimeoutRef.current = null;
+    }
     if (userInputs.length > 0) {
       const newInputs = userInputs.slice(0, -1);
       setUserInputs(newInputs);
