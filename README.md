@@ -25,6 +25,32 @@ A mobile-first web application for learning and practicing [Ingress](https://ing
 
 ---
 
+## Optional: Cloud Sync & Google Login
+
+The app supports an optional Google Authentication flow using `@react-oauth/google`. This allows you to uniquely identify users by extracting a profile and unique `sub` ID, serving as an anchor for a local or remote database extension.
+
+To build and turn this feature on:
+
+1. **Obtain a Google Client ID:**
+   - Sign in to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Create a project and navigate to **APIs & Services > Credentials**.
+   - Click **Create Credentials** -> **OAuth client ID** (Application type: Web application).
+   - Under "Authorized JavaScript origins", add your local dev URL: `http://localhost:5173` and your production URL.
+
+2. **Configure the Environment:**
+   - In the root folder of this project (`glyph-teacher`), create a new text file named `.env`.
+   - Add your Client ID variable in the file:
+     ```env
+     VITE_GOOGLE_CLIENT_ID=your-new-client-id.apps.googleusercontent.com
+     ```
+   - Restart your npm development server.
+
+3. **Enable within the App:**
+   - Upon launching the app, you will see a subtle **ENABLE SYNC** toggle in the top-right corner.
+   - Click it to render the "Sign in with Google" widget. Once authenticated, your profile is stored, and subsequent reloads will automatically populate your authenticated state!
+
+---
+
 ## Running Locally
 
 ```bash

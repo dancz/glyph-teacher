@@ -6,6 +6,7 @@ import HackScreen from './components/HackScreen';
 import GlyphDictionary from './components/GlyphDictionary';
 import SequenceDictionary from './components/SequenceDictionary';
 import TrainingScreen from './components/TrainingScreen';
+import LoginButton from './components/LoginButton';
 
 function App() {
   const game = useGlyphGame();
@@ -86,6 +87,9 @@ function App() {
 
   return (
     <div className="screen-container">
+      <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 100 }}>
+        <LoginButton />
+      </div>
       {renderContent()}
       
       {game.gameState === GAME_STATES.IDLE && (
